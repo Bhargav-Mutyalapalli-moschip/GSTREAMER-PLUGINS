@@ -1,124 +1,125 @@
 #define DEFAULT_SIZE 1920
-#define DEF_START 1
+#define DEF_START 0
 #define DEF_END 2147483647
-#define DEF_WVAL 176
-#define DEF_HVAL 144
+#define DEF_WVAL 0
+#define DEF_HVAL 0
 #define DEF_XVAL 0
 #define DEF_YVAL 0
 #define DEF_XSTART 0
-#define DEF_XEND 1920
+#define DEF_XEND 2147483647
 #define DEF_YSTART 0
-#define DEF_YEND 1080
+#define DEF_YEND 2147483647
 
 /*----------------Gstreamer Variable declarartions----------------------*/
 	/*------------------------------------------------------------*/
 	GstBuffer *my_buffer = NULL;
-	GstVideoInfo o_video_info,p_video_info;
-	GstVideoFrame o_vframe,p_vframe;
-	GstCaps *o_caps=NULL;
-	GstCaps *p_caps=NULL;
+	GstVideoInfo org_video_info;
+	GstVideoInfo pre_video_info;
+	GstVideoFrame org_vframe,pre_vframe;
+	GstCaps *org_caps=NULL;
+	GstCaps *pre_caps=NULL;
 	char *format_str = NULL;
 
 
 	/*--------Own buffer variable declarations------------------*/
 	//plane retrieval for single plane
-	guint8 *o_n_pixels=NULL;
-	guint8 *o_rgb_pixel=NULL; //accessing variable 
+	guint8 *org_n_pixels=NULL;
+	guint8 *org_rgb_pixel=NULL; //accessing variable 
 	
 	//plane retrieval for two plane
-	guint8 *o_y_pixels=NULL;
-	guint8 *o_uv_pixels=NULL;
-	guint8 *o_y_pixel=NULL;
-	guint8 *o_uv_pixel=NULL;
+	guint8 *org_y_pixels=NULL;
+	guint8 *org_uv_pixels=NULL;
+	guint8 *org_y_pixel=NULL;
+	guint8 *org_uv_pixel=NULL;
 
 	//plane retrieval for three plane
-	guint8 *o_u_pixels=NULL;
-	guint8 *o_v_pixels=NULL;
-	guint8 *o_u_pixel=NULL;
-	guint8 *o_v_pixel=NULL;
+	guint8 *org_u_pixels=NULL;
+	guint8 *org_v_pixels=NULL;
+	guint8 *org_u_pixel=NULL;
+	guint8 *org_v_pixel=NULL;
 	
 	
 	//stride retrieval for single plane
-	guint o_rgb_stride=0;
+	guint org_rgb_stride=0;
 
 	//stride retrieval for two plane
-	guint o_y_stride=0;
-	guint o_uv_stride=0;
+	guint org_y_stride=0;
+	guint org_uv_stride=0;
 
 	//stride retrieval for three plane
-	guint o_u_stride=0;
-	guint o_v_stride=0;
+	guint org_u_stride=0;
+	guint org_v_stride=0;
 
 	//pixel stride retrieval for single plane and two plane
-	guint o_pixel_stride = 0;
+	guint org_pixel_stride = 0;
 
 	//pixel stride retrieval for three plane
-	guint o_pixel_stride_y = 0; // pixel stride for Y plane in YV12
-	guint o_pixel_stride_u = 0; // pixel stride for U plane in YV12
-	guint o_pixel_stride_v = 0; // pixel stride for V plane in YV12
+	guint org_pixel_stride_y = 0; // pixel stride for Y plane in YV12
+	guint org_pixel_stride_u = 0; // pixel stride for U plane in YV12
+	guint org_pixel_stride_v = 0; // pixel stride for V plane in YV12
 	
 	/*----Basic caps variables---*/
-	gint o_width=0;
-	gint o_height=0;
+	gint org_width=0;
+	gint org_height=0;
         /*--------video frame size calculation variables-----*/
-	gint o_size=0;
-	gint o_y_size=0;
-	gint o_u_size=0;
-	gint o_v_size=0;
-	gint o_e_size=0;
+	gint org_size=0;
+	gint org_y_size=0;
+	gint org_u_size=0;
+	gint org_v_size=0;
+	gint org_e_size=0;
 
-	gint o_no_planes=0;
-	gint o_bpp=0;
-	gint o_format_no=0;
+	gint org_no_planes=0;
+	gint org_bpp=0;
+	gint org_format_no=0;
 
 	/*---------------------------------------------------------------------------*/
 
 	/*--------Predefined buffer variable declarations------------------*/
 	//plane retrieval for single plane
-	guint8 *p_n_pixels=NULL;
-	guint8 *p_rgb_pixel=NULL; //accessing variable 
+	guint8 *pre_n_pixels=NULL;
+	guint8 *pre_rgb_pixel=NULL; //accessing variable 
 	
 	//plane retrieval for two plane
-	guint8 *p_y_pixels=NULL;
-	guint8 *p_uv_pixels=NULL;
-	guint8 *p_y_pixel=NULL;
-	guint8 *p_uv_pixel=NULL;
+	guint8 *pre_y_pixels=NULL;
+	guint8 *pre_uv_pixels=NULL;
+	guint8 *pre_y_pixel=NULL;
+	guint8 *pre_uv_pixel=NULL;
 
 	//plane retrieval for three plane
-	guint8 *p_u_pixels=NULL;
-	guint8 *p_v_pixels=NULL;
-	guint8 *p_u_pixel=NULL;
-	guint8 *p_v_pixel=NULL;
+	guint8 *pre_u_pixels=NULL;
+	guint8 *pre_v_pixels=NULL;
+	guint8 *pre_u_pixel=NULL;
+	guint8 *pre_v_pixel=NULL;
 	
 	
 	//stride retrieval for single plane
-	guint p_rgb_stride=0;
+	guint pre_rgb_stride=0;
 
 	//stride retrieval for two plane
-	guint p_y_stride=0;
-	guint p_uv_stride=0;
+	guint pre_y_stride=0;
+	guint pre_uv_stride=0;
 
 	//stride retrieval for three plane
-	guint p_u_stride=0;
-	guint p_v_stride=0;
+	guint pre_u_stride=0;
+	guint pre_v_stride=0;
 
 	//pixel stride retrieval for single plane and two plane
-	guint p_pixel_stride = 0;
+	guint pre_pixel_stride = 0;
 
 	//pixel stride retrieval for three plane
-	guint p_pixel_stride_y = 0; // pixel stride for Y plane in YV12
-	guint p_pixel_stride_u = 0; // pixel stride for U plane in YV12
-	guint p_pixel_stride_v = 0; // pixel stride for V plane in YV12
+	guint pre_pixel_stride_y = 0; // pixel stride for Y plane in YV12
+	guint pre_pixel_stride_u = 0; // pixel stride for U plane in YV12
+	guint pre_pixel_stride_v = 0; // pixel stride for V plane in YV12
 	
 	/*----Basic caps variables---*/
-	gint p_width=0;
-	gint p_height=0;
+	gint pre_width=0;
+	gint pre_height=0;
         /*--------video frame size calculation variables-----*/
-	gint p_size=0;
+	gint pre_size=0;
 
-	gint p_no_planes=0;
-	gint p_bpp=0;
-	gint p_format_no=0;
+	gint pre_no_planes=0;
+	gint pre_bpp=0;
+	gint pre_format_no=0;
 
 	/*---------------------------------------------------------------------------*/
 

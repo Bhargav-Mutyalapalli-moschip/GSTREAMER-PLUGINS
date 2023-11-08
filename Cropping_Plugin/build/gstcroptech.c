@@ -92,7 +92,6 @@ enum
 	PROP_HEIGHT,            //it is filled with three
 	PROP_XCO,               //it is filled with four
 	PROP_YCO,               //it is filled with five
-	PROP_FORMAT,            //it is filled with six
 };
 
 
@@ -107,27 +106,23 @@ static GstStaticPadTemplate sink_factory = GST_STATIC_PAD_TEMPLATE ("sink",
 		GST_PAD_SINK,
 		GST_PAD_ALWAYS,
 		GST_STATIC_CAPS ("video/x-raw, "
-                                         
-                                         "framerate = (fraction) [0/1, 2147483647/1], "
                                          "format = (string) { I420, NV12, NV21, YV12,RGB16,NV16,NV24,\
 					 RGBx, xRGB, BGRx, xBGR, RGBA, ARGB,BGRA, ABGR, RGB, BGR, AYUV, YUY2, \
 					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE },"
-					 "width = (int) [1, 2147483647], "
-                                         "height = (int) [1, 2147483647]"
-                                         ));
+                                         "width = (int) [1, 2147483647], "
+                                         "height = (int) [1, 2147483647], "
+                                         "framerate = (fraction) [0/1, 2147483647/1]"));
 //It creates the sink template for my plugin
 static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE ("src",
 		GST_PAD_SRC,
 		GST_PAD_ALWAYS,
 		GST_STATIC_CAPS ("video/x-raw, "
-                                       
-                                         "framerate = (fraction) [0/1, 2147483647/1], "
                                          "format = (string) { I420, NV12, NV21, YV12,RGB16,NV16,NV24,\
 					 RGBx, xRGB, BGRx, xBGR, RGBA, ARGB,BGRA, ABGR, RGB, BGR, AYUV, YUY2, \
 					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE },"
-					  "width = (int) [1, 2147483647], "
-                                         "height = (int) [1, 2147483647]"
-                                         ));
+                                         "width = (int) [1, 2147483647], "
+                                         "height = (int) [1, 2147483647], "
+                                         "framerate = (fraction) [0/1, 2147483647/1]"));
 
 
 /*--------substitute the parent_class in place of own variable gst_custom_parent_class-------*/
@@ -157,7 +152,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad,GstObject * parent, GstBuf
 //Every plugin first entry point
 static gboolean croptech_init (GstPlugin * croptech)
 {
-	
+	//GST_DEBUG_OBJECT(filter,"First entry point of every plugin:plugin_init\n");
 	/* debug category for filtering log messages
 	 *
 	 * exchange the string 'Template croptech' with your description
@@ -172,7 +167,7 @@ static gboolean croptech_init (GstPlugin * croptech)
 //Second entry point of every plugin
 static void gst_croptech_class_init (GstCroptechClass * klass)
 {
-	
+	//GST_DEBUG_OBJECT(filter,"Second entry point of every plugin:class init\n");
 	/*It is the GObjectClass  variable is a pointer to the class structure of a GObject-derived class and 
 	 * it represents the blueprint or definition of a class and contains function pointers, class-specific data,
 	 * and other information necessary for working with instances of that class.
@@ -208,7 +203,6 @@ static void gst_croptech_class_init (GstCroptechClass * klass)
 	g_object_class_install_property (gobject_class, PROP_HEIGHT,g_param_spec_int ("height", "height", "The height is to display the cropped part",DEF_START,DEF_END,DEF_HVAL,G_PARAM_READWRITE));
 	g_object_class_install_property (gobject_class, PROP_XCO,g_param_spec_int ("xco", "xco", "The xco co-ord is to display the cropped part",DEF_XSTART,DEF_XEND,DEF_XVAL,G_PARAM_READWRITE));
 	g_object_class_install_property (gobject_class, PROP_YCO,g_param_spec_int ("yco", "yco", "The yco co-ord is to display the cropped part",DEF_YSTART,DEF_YEND,DEF_YVAL,G_PARAM_READWRITE));
-	g_object_class_install_property (gobject_class, PROP_FORMAT,g_param_spec_string ("format", "format", "Set the format here ","YV12", G_PARAM_READWRITE));
 
 	/*---If you are writing a simple plugin details or metadata is important to specify the author and other info
 	 * which is nontechnical info and technical info.
@@ -230,7 +224,6 @@ static void gst_croptech_class_init (GstCroptechClass * klass)
 static void gst_croptech_init (GstCroptech * filter)
 {
 	GST_DEBUG_OBJECT(filter,"Third entry point of every plugin:gst_plugin_init\n");
-
 
 	/*--------------PAD RETRIEVAL-----------------------*/
 	//it retrieves the src pad from static pad templates
@@ -279,16 +272,15 @@ static void gst_croptech_init (GstCroptech * filter)
 	filter->height = DEF_HVAL;
 	filter->xco = DEF_XVAL ;
 	filter->yco = DEF_YVAL;
-	strcpy(filter->format,"YV12");
 }
 
 //Fourth Entry point of every plugin(If you set the properties dynamically)
 static void gst_croptech_set_property (GObject * object, guint prop_id,const GValue * value, GParamSpec * pspec)
 {
-	
 	//It retrieves the elements data from object
 	GstCroptech *filter = GST_CROPTECH (object);
-        GST_DEBUG_OBJECT(filter,"gst_croptech set property  is invoked\n");
+	GST_DEBUG_OBJECT(filter,"gst_croptech set property  is invoked\n");
+
 	switch (prop_id) {
 		case PROP_SILENT:
 			filter->silent = g_value_get_boolean (value);
@@ -305,9 +297,6 @@ static void gst_croptech_set_property (GObject * object, guint prop_id,const GVa
 		case PROP_YCO:
 			filter->yco = g_value_get_int (value);
 			break;
-		case PROP_FORMAT:
-			strcpy(filter->format,g_value_get_string (value));
-			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -319,7 +308,7 @@ static void gst_croptech_get_property (GObject * object, guint prop_id,GValue * 
 {
 	//It retrieves the elements data from object
 	GstCroptech *filter = GST_CROPTECH (object);
-        
+
 	switch (prop_id) {
 		case PROP_SILENT:
 			g_value_set_boolean (value, filter->silent);
@@ -336,9 +325,6 @@ static void gst_croptech_get_property (GObject * object, guint prop_id,GValue * 
 		case PROP_YCO:
 			g_value_set_int (value, filter->yco);
 			break;
-		case PROP_FORMAT:
-			g_value_set_string (value, filter->format);
-			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
@@ -348,17 +334,15 @@ static void gst_croptech_get_property (GObject * object, guint prop_id,GValue * 
 //Sink event handling function
 static gboolean gst_croptech_sink_event (GstPad * pad, GstObject * parent,GstEvent * event)
 {
-	g_print("gst_custom sink event  is invoked\n");
 	GstCroptech *filter;
 	gboolean ret;
 
 	//It retrieves the elements data from object
 	filter = GST_CROPTECH (parent);
-        GST_DEBUG_OBJECT(filter,"croptech plugin sink event is invoked");
+	GST_DEBUG_OBJECT(filter,"croptech plugin sink event is invoked");
+
 	//For debug info to genarate the log file
 	GST_LOG_OBJECT (filter, "Received %s event: %" GST_PTR_FORMAT,GST_EVENT_TYPE_NAME (event), event);
-	g_print ("Received %s event: %" GST_PTR_FORMAT,GST_EVENT_TYPE_NAME (event), event);
-	g_print("\n");
 
 	switch (GST_EVENT_TYPE (event)) {
 		case GST_EVENT_CAPS:
@@ -394,17 +378,17 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	GstCroptech *filter;
 
 	//It retrieves the elements data from object
-	filter = GST_CROPTECH (parent);
+	filter = GST_CROPTECH (parent); 
 
-	o_width=filter->width;
-	o_height=filter->height;
-	g_print("Format: %s\n", filter->format);
+	org_width=filter->width; 
+	org_height=filter->height;
+	
 
 	/*----Retrieving the predfined caps------------------------------*/
-	p_caps=gst_pad_get_current_caps(pad);
+	pre_caps=gst_pad_get_current_caps(pad);
 	
 	/*--------------------Predefined buffer--------------------------*/
-	if(gst_video_info_from_caps(&p_video_info, p_caps))
+	if(gst_video_info_from_caps(&pre_video_info, pre_caps))
 	{
 		GST_DEBUG_OBJECT(filter,"Successfully caps parsed and video info is updated \n");
 	}
@@ -413,22 +397,24 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		GST_DEBUG_OBJECT(filter,"failed  to Parse caps and update video info \n");
 	}
 
-	
+
+        org_width=pre_video_info.width;
++	org_height=pre_video_info.height;
 	/*-----Retrieving the format macro number from the video info structure-------*/
-	o_format_no=p_video_info.finfo->format;
+	org_format_no=pre_video_info.finfo->format;
 
 	/*--------------------------------Video Frame size calculations:start-----------------------------------*/
 	/*-----------------------------------------------------------------------------------------------------*/
-	switch(o_format_no)
+	switch(org_format_no)
 	{
 		case GST_VIDEO_FORMAT_NV12:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height)/4;
-				o_v_size=(o_width * o_height)/4;
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV12 : %d\n",o_size);
-				o_bpp=12;
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height)/4;
+				org_v_size=(org_width * org_height)/4;
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV12 : %d\n",org_size);
+				org_bpp=12;
 				denom1=2;
 				denom2=2;
 				strcpy(filter->format,"NV12");
@@ -436,303 +422,312 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			}
 		case GST_VIDEO_FORMAT_YV12:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height)/4;
-				o_v_size=(o_width * o_height)/4;
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for YV12 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height)/4;
+				org_v_size=(org_width * org_height)/4;
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YV12 : %d\n",org_size);
 				strcpy(filter->format,"YV12");
-				o_bpp=12;
+				org_bpp=12;
 				break;
 			}
 
 		case GST_VIDEO_FORMAT_NV21:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height)/4;
-				o_v_size=(o_width * o_height)/4;
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV21 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height)/4;
+				org_v_size=(org_width * org_height)/4;
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV21 : %d\n",org_size);
 				denom1=2;
 				denom2=2;
 				strcpy(filter->format,"NV21");
-				o_bpp=12;
+				org_bpp=12;
 				break;
 			}
 
 		case GST_VIDEO_FORMAT_NV16:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height)/2;
-				o_v_size=(o_width * o_height)/2;
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV16 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height)/2;
+				org_v_size=(org_width * org_height)/2;
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV16 : %d\n",org_size);
 				denom1=1;
 				denom2=2;
 				strcpy(filter->format,"NV16");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_NV24:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV24 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV24 : %d\n",org_size);
 				denom1=1;
 				denom2=1;
 				strcpy(filter->format,"NV24");
-				o_bpp=24;
+				org_bpp=24;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGB:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB : %d\n",org_size);
 				strcpy(filter->format,"RGB");
-				o_bpp=24;
+				org_bpp=24;
 				ind=0;
 				break;
 			}
 		case GST_VIDEO_FORMAT_BGR:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGR : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGR : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"BGR");
-				o_bpp=24;
+				org_bpp=24;
 				break;
 			}
 
 		case GST_VIDEO_FORMAT_GRAY8:
 			{
-				o_y_size=(o_width * o_height);
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY8 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY8 : %d\n",org_size);
 				strcpy(filter->format,"GRAY8");
-				o_bpp=8;
+				org_bpp=8;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGBx:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBx : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBx : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"RGBx");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_xRGB:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for xRGB : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for xRGB : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"xRGB");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_BGRx:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRx : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRx : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"BGRx");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_xBGR:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for xBGR : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for xBGR : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"xBGR");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGBA:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBA : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBA : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"RGBA");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_ARGB:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for ARGB : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for ARGB : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"ARGB");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_BGRA:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRA : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRA : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"BGRA");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_ABGR:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for ABGR : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for ABGR : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"ABGR");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGB16:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB16 : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB16 : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"RGB16");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGB15:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB15 : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB15 : %d\n",org_size);
 				strcpy(filter->format,"RGB15");
-				o_bpp=15;
+				org_bpp=15;
 				ind=0;
 				break;
 			}
 		case GST_VIDEO_FORMAT_I420:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height)/4;
-				o_v_size=(o_width * o_height)/4;
-				o_size=o_y_size + o_u_size + o_v_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for I420 : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height)/4;
+				org_v_size=(org_width * org_height)/4;
+				org_size=org_y_size + org_u_size + org_v_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for I420 : %d\n",org_size);
 				denom1=2;
 				denom2=2;
 				strcpy(filter->format,"I420");
-				o_bpp=12;
+				org_bpp=12;
 				break;
 			}
 		case GST_VIDEO_FORMAT_GRAY16_LE:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_LE : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_LE : %d\n",org_size);
 				strcpy(filter->format,"GRAY16_LE");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_GRAY16_BE:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_BE : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_BE : %d\n",org_size);
 				strcpy(filter->format,"GRAY16_BE");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_AYUV:
 			{
-				o_y_size=(o_width * o_height);
-				o_u_size=(o_width * o_height);
-				o_v_size=(o_width * o_height);
-				o_e_size=(o_width * o_height);
-				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for AYUV : %d\n",o_size);
+				org_y_size=(org_width * org_height);
+				org_u_size=(org_width * org_height);
+				org_v_size=(org_width * org_height);
+				org_e_size=(org_width * org_height);
+				org_size=org_y_size + org_u_size + org_v_size + org_e_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for AYUV : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"AYUV");
-				o_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_YUY2:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for YUY2 : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YUY2 : %d\n",org_size);
 				ind=0;
 				strcpy(filter->format,"YUY2");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_YVYU:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for YVYU : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YVYU : %d\n",org_size);
 				strcpy(filter->format,"YVYU");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		case GST_VIDEO_FORMAT_UYVY:
 			{
-				o_y_size=(o_width * o_height)*2;
-				o_size=o_y_size;
-				GST_DEBUG_OBJECT(filter,"Buffer creating size for UYVY : %d\n",o_size);
+				org_y_size=(org_width * org_height)*2;
+				org_size=org_y_size;
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for UYVY : %d\n",org_size);
 				strcpy(filter->format,"UYVY");
-				o_bpp=16;
+				org_bpp=16;
 				break;
 			}
 		default:
-			GST_DEBUG_OBJECT(filter,"Please give valid format\n");
+			g_print("Please give valid format\n");
 			break;
 	}
+	/*-----------------------------------------------------------------------------------------------------*/
+	/*--------------------------------Video Frame size calculations:end------------------------------------*/
+
 	/*----------------Caps for my own buffer -----------------*/
 	// Create a caps structure to describe the frame format
-	o_caps = gst_caps_new_simple("video/x-raw",
-			"format", G_TYPE_STRING,filter->format,
-			"width", G_TYPE_INT, o_width,
-			"height", G_TYPE_INT, o_height,
-			"bpp",G_TYPE_INT,o_bpp,
+	org_caps = gst_caps_copy(pre_caps); //copy the caps from predefined caps(metadata also copied)
+
+	GstStructure *structure = gst_caps_get_structure(org_caps, 0); //retrieve the caps structure
+
+	/*----It is used the some parameters in the structure ---*/
+	gst_structure_set(structure, "width", G_TYPE_INT, org_width, \
+			"height", G_TYPE_INT, org_height, \
+			"format", G_TYPE_STRING, filter->format,\
+			"bpp",G_TYPE_INT,org_bpp, \
 			NULL);
+	/*-------------------------------------------------------*/
+	
 
 	/*----------------------------------Video info from caps:start-------------------------------------------*/
 	/*--------------------own buffer--------------------------*/
 	/*-------------------------------------------------------*/
-	if(gst_video_info_from_caps(&o_video_info, o_caps))
+	if(gst_video_info_from_caps(&org_video_info, org_caps))
 	{
 		GST_DEBUG_OBJECT(filter,"Successfully caps parsed and video info is updated \n");
 	}
@@ -742,8 +737,6 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	}
 	/*----------------------------------Video info from caps:end-------------------------------------------*/
 
-	/*-----------------------------------------------------------------------------------------------------*/
-	/*--------------------------------Video Frame size calculations:end------------------------------------*/
 
 	/*------------------------------------Corner points calculations:start---------------------------------*/
 	/*-----------------------------------------------------------------------------------------------------*/
@@ -752,8 +745,8 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	GST_DEBUG_OBJECT(filter,"corner x:%d    corner y:%d\n",corner_x,corner_y);
 
 	// Calculate the coordinates of the top-left and bottom-right corners
-	gint rect_bottom = corner_y + o_height;
-	gint rect_right = corner_x + o_width;
+	gint rect_bottom = corner_y + org_height;
+	gint rect_right = corner_x + org_width;
 	GST_DEBUG_OBJECT(filter,"The max height : %d   The max width : %d\n",rect_bottom,rect_right);
 
 	/*-----------------------------------------------------------------------------------------------------*/
@@ -762,8 +755,8 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	/*--------------------------------------Buffer creation:start----------------------------------------*/
 	/*---------------------------------------------------------------------------------------------------*/
 	// Allocate a buffer with the specified size
-	my_buffer= gst_buffer_new_allocate(NULL, o_size, NULL );
-	if (!gst_buffer_make_writable(my_buffer))
+	my_buffer= gst_buffer_new_allocate(NULL, org_size, NULL );
+	if (!gst_buffer_make_writable(my_buffer))  //Give the writable permissions to newly created buffer
 	{
 		GST_DEBUG_OBJECT(filter,"Failed  to make the buffer writable \n");
 		gst_buffer_unref(my_buffer);
@@ -773,7 +766,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	{
 		GST_DEBUG_OBJECT(filter,"Successfully writable permissions are given to own buffer\n");
 	}
-	gst_buffer_memset(my_buffer,0,0,o_size); //it clears the garbage values in created buffer
+	gst_buffer_memset(my_buffer,0,0,org_size); //it clears the garbage values in created buffer
 
 	/*---------------------------------------------------------------------------------------------------*/
 	/*--------------------------------------Buffer creation:end------------------------------------------*/
@@ -781,7 +774,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	/*--------------------------------------Video frame mapping:start------------------------------------*/
 	/*---------------------------------------------------------------------------------------------------*/
 	//Predefined buffer video map
-	if(gst_video_frame_map(&p_vframe, &p_video_info, buf, GST_MAP_READ))
+	if(gst_video_frame_map(&pre_vframe, &pre_video_info, buf, GST_MAP_READ))
 	{
 		GST_DEBUG_OBJECT(filter,"Successfilly videoframe is mapped for predefined buffer \n");
 	}
@@ -791,14 +784,17 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	}
 
 	//Own buffer video map
-	if(gst_video_frame_map(&o_vframe, &o_video_info, my_buffer, GST_MAP_WRITE))
+	if(gst_video_frame_map(&org_vframe, &org_video_info, my_buffer, GST_MAP_WRITE))
 	{
 		GST_DEBUG_OBJECT(filter,"Successfilly videoframe is mapped for own buffer \n");
 	}
 	else
 	{
 		GST_DEBUG_OBJECT(filter,"Failed to map the video frame for own buffer\n");
+		g_warning("Unable to map this caps(width & height)\n");
+		g_message("please follow the some standards\n");
 		return GST_FLOW_ERROR;
+
 	}
 	/*---------------------------------------------------------------------------------------------------*/
 	/*--------------------------------------Video frame mapping:end--------------------------------------*/
@@ -806,19 +802,19 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 
 	/*--------------------------------------Errors checking:start----------------------------------------*/
 	/*---------------------------------------------------------------------------------------------------*/
-	p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe); //it retrieves the predefined width
-	p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe); //it retrieves the predefined height
-	gint planes=GST_VIDEO_FRAME_N_PLANES(&o_vframe); //it retrieves the no of planes 
+	pre_width = GST_VIDEO_FRAME_WIDTH(&pre_vframe); //it retrieves the predefined width
+	pre_height = GST_VIDEO_FRAME_HEIGHT(&pre_vframe); //it retrieves the predefined height
+	gint planes=GST_VIDEO_FRAME_N_PLANES(&org_vframe); //it retrieves the no of planes 
 	GST_DEBUG_OBJECT(filter,"No of planes : %d\n",planes);
 
-	if(rect_right > p_width || rect_bottom > p_height)
+	if(rect_right > pre_width || rect_bottom > pre_height)
 	{
 		g_warning("Please give the width,height,x cordinate and y cordinate within the limits only\n");
-		g_message("The valid caps : Width : %d  Height : %d\n",p_width,p_height);
+		g_message("The valid caps : Width : %d  Height : %d\n",pre_width,pre_height);
 		g_message("Give the inputs within this caps limit\n");
-		gst_video_frame_unmap(&o_vframe);
-		gst_video_frame_unmap(&p_vframe);
-		exit(1);
+		gst_video_frame_unmap(&org_vframe);
+		gst_video_frame_unmap(&pre_vframe);
+		return GST_FLOW_ERROR;
 	}
 	/*---------------------------------------------------------------------------------------------------*/
 	/*--------------------------------------Errors checking:end------------------------------------------*/
@@ -830,85 +826,85 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	{
 		/*-------------------Getting strides for own buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		o_n_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 0); // Y plane
+		org_n_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 0); // Pixels data starting base address
 
-		o_rgb_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 0); // Y plane stride
+		org_rgb_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 0); // single plane stride
 
-		o_pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE(&o_vframe,0);
+		org_pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE(&org_vframe,0); // single plane pixel stride
 
-		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
-		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
+		org_width = GST_VIDEO_FRAME_WIDTH(&org_vframe); //retrieves the width
+		org_height = GST_VIDEO_FRAME_HEIGHT(&org_vframe); //retrieves the height
 
 		GST_DEBUG_OBJECT(filter,"Strides of a own buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",o_rgb_stride,o_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",org_width,org_height);
+		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",org_rgb_stride,org_pixel_stride);
 
 
 		/*-------------------Getting strides for predefined buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		p_n_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 0); // Y plane
+		pre_n_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 0); // Pixels data starting base address
 
-		p_rgb_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 0); // Y plane stride
+		pre_rgb_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 0); // single plane stride
 
-		p_pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE(&p_vframe,0);
+		pre_pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE(&pre_vframe,0); //single plane pixel stride
 
-		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
-		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
+		pre_width = GST_VIDEO_FRAME_WIDTH(&pre_vframe); //retrieves the width
+		pre_height = GST_VIDEO_FRAME_HEIGHT(&pre_vframe); //retrieves the height
 
 		GST_DEBUG_OBJECT(filter,"Strides and caps info for predefined buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",p_rgb_stride,p_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",pre_width,pre_height);
+		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",pre_rgb_stride,pre_pixel_stride);
 
 
 
 
 		gint h1=0,w1=0,h2=0,w2=0;
 		// Loop through the entire frame
-		for(h1=0,h2=corner_y;h1<o_height && h2< rect_bottom ;h1++,h2++)
+		for(h1=0,h2=corner_y;h1<org_height && h2< rect_bottom ;h1++,h2++)
 		{
-			for(w1=0,w2=corner_x;w1<o_width && w2 < rect_right;w1++,w2++)
+			for(w1=0,w2=corner_x;w1<org_width && w2 < rect_right;w1++,w2++)
 			{
 				//----------------------This is for own buffer--------------
 				//----------------------------------------------------------
-				o_rgb_pixel = o_n_pixels + h1 * o_rgb_stride + w1 * o_pixel_stride ;
+				org_rgb_pixel = org_n_pixels + h1 * org_rgb_stride + w1 * org_pixel_stride ;
 				//----------------------This is for predefined buffer--------------
 				//----------------------------------------------------------
-				p_rgb_pixel = p_n_pixels + h2 * p_rgb_stride + w2 * p_pixel_stride ;
+				pre_rgb_pixel = pre_n_pixels + h2 * pre_rgb_stride + w2 * pre_pixel_stride ;
 				if (w2 >= corner_x && w2 < rect_right && h2 >= corner_y && h2 < rect_bottom)
 				{
-					if(o_format_no == GST_VIDEO_FORMAT_GRAY8)
+					if(org_format_no == GST_VIDEO_FORMAT_GRAY8)
 					{
-						o_rgb_pixel[0]=p_rgb_pixel[0];
+						org_rgb_pixel[0]=pre_rgb_pixel[0];
 					}
-					else if( o_format_no == GST_VIDEO_FORMAT_GRAY16_BE || o_format_no == GST_VIDEO_FORMAT_GRAY16_LE)
+					else if( org_format_no == GST_VIDEO_FORMAT_GRAY16_BE || org_format_no == GST_VIDEO_FORMAT_GRAY16_LE)
 					{
-						o_rgb_pixel[0]=p_rgb_pixel[0];
-						o_rgb_pixel[1]=p_rgb_pixel[1];
+						org_rgb_pixel[0]=pre_rgb_pixel[0];
+						org_rgb_pixel[1]=pre_rgb_pixel[1];
 					}
-					else if( o_format_no == GST_VIDEO_FORMAT_UYVY || o_format_no == GST_VIDEO_FORMAT_YVYU)
+					else if( org_format_no == GST_VIDEO_FORMAT_UYVY || org_format_no == GST_VIDEO_FORMAT_YVYU)
 					{
 
 
-						o_rgb_pixel[0]=p_rgb_pixel[0];
-						o_rgb_pixel[1]=p_rgb_pixel[1];
-						o_rgb_pixel[2]=p_rgb_pixel[2];
-						o_rgb_pixel[3]=p_rgb_pixel[3];
+						org_rgb_pixel[0]=pre_rgb_pixel[0];
+						org_rgb_pixel[1]=pre_rgb_pixel[1];
+						org_rgb_pixel[2]=pre_rgb_pixel[2];
+						org_rgb_pixel[3]=pre_rgb_pixel[3];
 					}
 					else
 					{
 
 
-						o_rgb_pixel[ind]=p_rgb_pixel[ind];
-						o_rgb_pixel[1]=p_rgb_pixel[1];
-						o_rgb_pixel[2]=p_rgb_pixel[2];
+						org_rgb_pixel[ind]=pre_rgb_pixel[ind];
+						org_rgb_pixel[1]=pre_rgb_pixel[1];
+						org_rgb_pixel[2]=pre_rgb_pixel[2];
 					}
 
 				}
 				else
 				{
-					o_rgb_pixel[0]=0;
-					o_rgb_pixel[1]=128;
-					o_rgb_pixel[2]=128;
+					org_rgb_pixel[0]=0;
+					org_rgb_pixel[1]=128;
+					org_rgb_pixel[2]=128;
 				}
 
 			}
@@ -921,66 +917,66 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	{
 		/*-------------------Getting strides for own buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		o_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 0); // Y plane
-		o_uv_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 1); // UV plane (interleaved)
+		org_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 0); // Y plane
+		org_uv_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 1); // UV plane (interleaved)
 
-		o_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 0); // Y plane stride
-		o_uv_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 1); // UV plane stride
-		o_pixel_stride = 2; // In NV12, UV values are interleaved every 2 bytes
+		org_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 0); // Y plane stride
+		org_uv_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 1); // UV plane stride
+		org_pixel_stride = 2; // In NV-Formates, UV values are interleaved every 2 bytes
 
-		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
-		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
+		org_width = GST_VIDEO_FRAME_WIDTH(&org_vframe);
+		org_height = GST_VIDEO_FRAME_HEIGHT(&org_vframe);
 
 		GST_DEBUG_OBJECT(filter,"Strides and caps info for Own buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride);
-		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",o_uv_stride,o_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",org_width,org_height);
+		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",org_y_stride,org_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",org_uv_stride,org_pixel_stride);
 
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
 		/*-------------------Getting strides for predefined buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		p_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 0); // Y plane
-		p_uv_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 1); // UV plane (interleaved)
+		pre_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 0); // Y plane
+		pre_uv_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 1); // UV plane (interleaved)
 
-		p_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 0); // Y plane stride
-		p_uv_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 1); // UV plane stride
-		p_pixel_stride = 2; // In NV12, UV values are interleaved every 2 bytes
+		pre_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 0); // Y plane stride
+		pre_uv_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 1); // UV plane stride
+		pre_pixel_stride = 2; // In NV-Formates, UV values are interleaved every 2 bytes
 
-		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
-		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
+		pre_width = GST_VIDEO_FRAME_WIDTH(&pre_vframe);
+		pre_height = GST_VIDEO_FRAME_HEIGHT(&pre_vframe);
 
 		GST_DEBUG_OBJECT(filter,"Strides and caps info for Predefined buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride);
-		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",p_uv_stride,p_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",pre_width,pre_height);
+		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",pre_y_stride,pre_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",pre_uv_stride,pre_pixel_stride);
 
 
 		gint h1=0,w1=0,h2=0,w2=0;
 		// Loop through the entire frame
-		for(h1=0,h2=corner_y;h1<o_height && h2< rect_bottom ;h1++,h2++)
+		for(h1=0,h2=corner_y;h1<org_height && h2< rect_bottom ;h1++,h2++)
 		{
-			for(w1=0,w2=corner_x;w1<o_width && w2 < rect_right;w1++,w2++)
+			for(w1=0,w2=corner_x;w1<org_width && w2 < rect_right;w1++,w2++)
 			{
 				//----------------------This is for own buffer--------------
 				//----------------------------------------------------------
-				o_y_pixel = o_y_pixels + h1 * o_y_stride + w1;
-				o_uv_pixel = o_uv_pixels + (h1/denom1)  * o_uv_stride + (w1/denom2) * o_pixel_stride;
+				org_y_pixel = org_y_pixels + h1 * org_y_stride + w1;
+				org_uv_pixel = org_uv_pixels + (h1/denom1)  * org_uv_stride + (w1/denom2) * org_pixel_stride;
 				//----------------------This is for predefined buffer--------------
 				//----------------------------------------------------------
-				p_y_pixel = p_y_pixels + h2 * p_y_stride + w2;
-				p_uv_pixel = p_uv_pixels + (h2/denom1) * p_uv_stride + (w2/denom2 ) * p_pixel_stride;
+				pre_y_pixel = pre_y_pixels + h2 * pre_y_stride + w2;
+				pre_uv_pixel = pre_uv_pixels + (h2/denom1) * pre_uv_stride + (w2/denom2 ) * pre_pixel_stride;
 				if (w2 >= corner_x && w2 < rect_right && h2 >= corner_y && h2 < rect_bottom)
 				{
-					o_y_pixel[0]=p_y_pixel[0];
-					o_uv_pixel[0]=p_uv_pixel[0];
-					o_uv_pixel[1]=p_uv_pixel[1];
+					org_y_pixel[0]=pre_y_pixel[0];
+					org_uv_pixel[0]=pre_uv_pixel[0];
+					org_uv_pixel[1]=pre_uv_pixel[1];
 				}
 				else
 				{
-					o_y_pixel[0]=0;
-					o_uv_pixel[0]=128;
-					o_uv_pixel[1]=128;
+					org_y_pixel[0]=0;
+					org_uv_pixel[0]=128;
+					org_uv_pixel[1]=128;
 				}
 
 			}
@@ -992,80 +988,81 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	{
 		/*-------------------Getting strides for own buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		o_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 0); // Y plane
-		o_u_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 1); // UV plane (interleaved)
-		o_v_pixels = GST_VIDEO_FRAME_PLANE_DATA(&o_vframe, 2); // UV plane (interleaved)
+		org_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 0); // Y plane
+		org_u_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 1); // U plane 
+		org_v_pixels = GST_VIDEO_FRAME_PLANE_DATA(&org_vframe, 2); // V plane 
 
-		o_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 0); // Y plane stride
-		o_u_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 1); // UV plane stride
-		o_v_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&o_vframe, 2); // UV plane stride
+		org_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 0); // Y plane stride
+		org_u_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 1); // U plane stride
+		org_v_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&org_vframe, 2); // V plane stride
 
-		o_pixel_stride_y = GST_VIDEO_FRAME_COMP_PSTRIDE(&o_vframe,0);
-		o_pixel_stride_u = GST_VIDEO_FRAME_COMP_PSTRIDE(&o_vframe,1);
-		o_pixel_stride_v = GST_VIDEO_FRAME_COMP_PSTRIDE(&o_vframe,2);
+		org_pixel_stride_y = GST_VIDEO_FRAME_COMP_PSTRIDE(&org_vframe,0); //Y plane pixel stride 
+		org_pixel_stride_u = GST_VIDEO_FRAME_COMP_PSTRIDE(&org_vframe,1); //U plane pixel stride
+		org_pixel_stride_v = GST_VIDEO_FRAME_COMP_PSTRIDE(&org_vframe,2); //V plane pixel stride
 
-		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
-		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
+		org_width = GST_VIDEO_FRAME_WIDTH(&org_vframe); //retrieves the width
+		org_height = GST_VIDEO_FRAME_HEIGHT(&org_vframe); //retreves the height
 
 		GST_DEBUG_OBJECT(filter,"Strides and caps info for Own buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride_y);
-		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",o_u_stride,o_pixel_stride_u);
-		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",o_v_stride,o_pixel_stride_v);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",org_width,org_height);
+		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",org_y_stride,org_pixel_stride_y);
+		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",org_u_stride,org_pixel_stride_u);
+		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",org_v_stride,org_pixel_stride_v);
 
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
 		/*-------------------Getting strides for predefined buffer---------------------------*/
 		/*-----------------------------------------------------------------------------*/
-		p_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 0); // Y plane
-		p_u_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 1); // UV plane (interleaved)
-		p_v_pixels = GST_VIDEO_FRAME_PLANE_DATA(&p_vframe, 2); // UV plane (interleaved)
+		pre_y_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 0); // Y plane
+		pre_u_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 1); // UV plane (interleaved)
+		pre_v_pixels = GST_VIDEO_FRAME_PLANE_DATA(&pre_vframe, 2); // UV plane (interleaved)
 
-		p_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 0); // Y plane stride
-		p_u_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 1); // UV plane stride
-		p_v_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&p_vframe, 2); // UV plane stride
+		pre_y_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 0); // Y plane stride
+		pre_u_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 1); // UV plane stride
+		pre_v_stride = GST_VIDEO_FRAME_PLANE_STRIDE(&pre_vframe, 2); // UV plane stride
 
-		p_pixel_stride_y = GST_VIDEO_FRAME_COMP_PSTRIDE(&p_vframe,0);
-		p_pixel_stride_u = GST_VIDEO_FRAME_COMP_PSTRIDE(&p_vframe,1);
-		p_pixel_stride_v = GST_VIDEO_FRAME_COMP_PSTRIDE(&p_vframe,2);
+		pre_pixel_stride_y = GST_VIDEO_FRAME_COMP_PSTRIDE(&pre_vframe,0);
+		pre_pixel_stride_u = GST_VIDEO_FRAME_COMP_PSTRIDE(&pre_vframe,1);
+		pre_pixel_stride_v = GST_VIDEO_FRAME_COMP_PSTRIDE(&pre_vframe,2);
 
-		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
-		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
+		pre_width = GST_VIDEO_FRAME_WIDTH(&pre_vframe);
+		pre_height = GST_VIDEO_FRAME_HEIGHT(&pre_vframe);
 
 		GST_DEBUG_OBJECT(filter,"Strides and caps info for Predefined buffer\n");
-		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride_y);
-		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",p_u_stride,p_pixel_stride_u);
-		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",p_v_stride,p_pixel_stride_v);
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",pre_width,pre_height);
+		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",pre_y_stride,pre_pixel_stride_y);
+		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",pre_u_stride,pre_pixel_stride_u);
+		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",pre_v_stride,pre_pixel_stride_v);
+
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
 		gint h1=0,w1=0,h2=0,w2=0;
 		// Loop through the entire frame
-		for(h1=0,h2=corner_y;h1<o_height && h2< rect_bottom ;h1++,h2++)
+		for(h1=0,h2=corner_y;h1<org_height && h2< rect_bottom ;h1++,h2++)
 		{
-			for(w1=0,w2=corner_x;w1<o_width && w2 < rect_right;w1++,w2++)
+			for(w1=0,w2=corner_x;w1<org_width && w2 < rect_right;w1++,w2++)
 			{
 				//----------------------This is for own buffer--------------
 				//----------------------------------------------------------
-				o_y_pixel = o_y_pixels + h1 * o_y_stride + w1 * o_pixel_stride_y;
-				o_u_pixel = o_u_pixels + h1 / 2 * o_u_stride + (w1 / 2) * o_pixel_stride_u;
-				o_v_pixel = o_v_pixels + h1 / 2 * o_v_stride + (w1 / 2) * o_pixel_stride_v;
+				org_y_pixel = org_y_pixels + h1 * org_y_stride + w1 * org_pixel_stride_y;
+				org_u_pixel = org_u_pixels + h1 / 2 * org_u_stride + (w1 / 2) * org_pixel_stride_u;
+				org_v_pixel = org_v_pixels + h1 / 2 * org_v_stride + (w1 / 2) * org_pixel_stride_v;
 				//----------------------This is for predefined buffer--------------
 				//----------------------------------------------------------
-				p_y_pixel = p_y_pixels + h2 * p_y_stride + w2 * p_pixel_stride_y;
-				p_u_pixel = p_u_pixels + h2 / 2 * p_u_stride + (w2 / 2) * p_pixel_stride_u;
-				p_v_pixel = p_v_pixels + h2 / 2 * p_v_stride + (w2 / 2) * p_pixel_stride_v;
+				pre_y_pixel = pre_y_pixels + h2 * pre_y_stride + w2 * pre_pixel_stride_y;
+				pre_u_pixel = pre_u_pixels + h2 / 2 * pre_u_stride + (w2 / 2) * pre_pixel_stride_u;
+				pre_v_pixel = pre_v_pixels + h2 / 2 * pre_v_stride + (w2 / 2) * pre_pixel_stride_v;
 				if (w2 >= corner_x && w2 < rect_right && h2 >= corner_y && h2 < rect_bottom)
 				{
-					o_y_pixel[0]=p_y_pixel[0];
-					o_u_pixel[0]=p_u_pixel[0];
-					o_v_pixel[0]=p_v_pixel[0];
+					org_y_pixel[0]=pre_y_pixel[0];
+					org_u_pixel[0]=pre_u_pixel[0];
+					org_v_pixel[0]=pre_v_pixel[0];
 				}
 				else
 				{
-					o_y_pixel[0]=0;
-					o_u_pixel[0]=128;
-					o_v_pixel[0]=128;
+					org_y_pixel[0]=0;
+					org_u_pixel[0]=128;
+					org_v_pixel[0]=128;
 				}
 
 			}
@@ -1074,11 +1071,11 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		}
 	}
 
-	GST_DEBUG_OBJECT(filter,"Negotiated caps: %s\n", gst_caps_to_string(o_caps));
+	GST_DEBUG_OBJECT(filter,"Negotiated caps: %s\n", gst_caps_to_string(org_caps));
 	// Set the negotiated caps on the source pad
-	gst_pad_set_caps(filter->srcpad, o_caps);
-	gst_video_frame_unmap(&o_vframe);
-	gst_video_frame_unmap(&p_vframe);
+	gst_pad_set_caps(filter->srcpad, org_caps);
+	gst_video_frame_unmap(&org_vframe);
+	gst_video_frame_unmap(&pre_vframe);
 
 
 
