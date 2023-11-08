@@ -355,6 +355,10 @@ static gboolean gst_croptech_sink_event (GstPad * pad, GstObject * parent,GstEve
 				/* do something with the caps */
 				//convert our caps to string for human readable format
 				gchar *caps_str = gst_caps_to_string(caps);
+				if(!caps_str)
+				{
+					GST_DEBUG_OBJECT(filter,"The received caps is :NULL\n");
+				}
 				GST_DEBUG_OBJECT(filter,"Received caps: %s\n", caps_str);
 				g_free(caps_str); //deallocate the memory for caps_str
 				/* and forward */
@@ -382,11 +386,16 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 
 	org_width=filter->width; 
 	org_height=filter->height;
-	
+
 
 	/*----Retrieving the predfined caps------------------------------*/
 	pre_caps=gst_pad_get_current_caps(pad);
-	
+	if(!pre_caps)
+	{
+		GST_DEBUG_OBJECT(filter,"Failed to retrieve the current cap \n");
+		return GST_FLOW_ERROR;
+
+	}
 	/*--------------------Predefined buffer--------------------------*/
 	if(gst_video_info_from_caps(&pre_video_info, pre_caps))
 	{
@@ -395,11 +404,12 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	else
 	{
 		GST_DEBUG_OBJECT(filter,"failed  to Parse caps and update video info \n");
+		return GST_FLOW_ERROR;
 	}
 
 
-        org_width=pre_video_info.width;
-+	org_height=pre_video_info.height;
+	org_width=pre_video_info.width;
+	org_height=pre_video_info.height;
 	/*-----Retrieving the format macro number from the video info structure-------*/
 	org_format_no=pre_video_info.finfo->format;
 
@@ -607,7 +617,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				GST_DEBUG_OBJECT(filter,"Buffer creating size for ABGR : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"ABGR");
-				org_bpp=32;
+					org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGB16:
@@ -712,7 +722,11 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	/*----------------Caps for my own buffer -----------------*/
 	// Create a caps structure to describe the frame format
 	org_caps = gst_caps_copy(pre_caps); //copy the caps from predefined caps(metadata also copied)
-
+	if(!org_caps)
+	{
+		GST_DEBUG_OBJECT(filter,"Failed to copy the predefined caps\n");
+		return GST_FLOW_ERROR;
+	}
 	GstStructure *structure = gst_caps_get_structure(org_caps, 0); //retrieve the caps structure
 
 	/*----It is used the some parameters in the structure ---*/
@@ -722,7 +736,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			"bpp",G_TYPE_INT,org_bpp, \
 			NULL);
 	/*-------------------------------------------------------*/
-	
+
 
 	/*----------------------------------Video info from caps:start-------------------------------------------*/
 	/*--------------------own buffer--------------------------*/
@@ -734,6 +748,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	else
 	{
 		GST_DEBUG_OBJECT(filter,"Failed  parse caps and video info  updation \n");
+		return GST_FLOW_ERROR;
 	}
 	/*----------------------------------Video info from caps:end-------------------------------------------*/
 
@@ -760,7 +775,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	{
 		GST_DEBUG_OBJECT(filter,"Failed  to make the buffer writable \n");
 		gst_buffer_unref(my_buffer);
-		return -1;
+		return GST_FLOW_ERROR;
 	}
 	else
 	{
@@ -781,6 +796,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	else
 	{
 		GST_DEBUG_OBJECT(filter,"Failed to map the video frame for predefined buffer\n");
+		return GST_FLOW_ERROR;
 	}
 
 	//Own buffer video map
