@@ -407,6 +407,16 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		return GST_FLOW_ERROR;
 	}
 
+	/*----------PREDEFINED CAPS GETS SUBSTITUTED--------------*/
+	if(filter->width == DEF_WVAL ) //if it is default means we have to update the incoming caps
+	{
+		org_width=pre_video_info.width;
+	}
+	if(filter-> height == DEF_HVAL) //if it is default means we have to update the incoming caps
+	{
+		org_height=pre_video_info.height;
+	}
+	/*--------------------------------------------------------*/
 
 	org_width=pre_video_info.width;
 	org_height=pre_video_info.height;
