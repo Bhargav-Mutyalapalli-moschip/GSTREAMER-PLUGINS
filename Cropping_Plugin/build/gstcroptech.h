@@ -63,13 +63,15 @@ struct _GstCroptech
 
   gboolean silent;
 
-  gint xco;
-  gint yco;
   gint width;
-  gint height;
-  gchar format[15];
-  const gchar* my_custom_field;
 
+  gint height;
+
+  gint xco;
+
+  gint yco;
+
+  gchar format[10];
 };
 
 G_END_DECLS
