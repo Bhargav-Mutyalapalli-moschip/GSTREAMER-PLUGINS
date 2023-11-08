@@ -153,7 +153,6 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad,GstObject * parent, GstBuf
 //Every plugin first entry point
 static gboolean croptech_init (GstPlugin * croptech)
 {
-	g_print("First entry point of every plugin:plugin_init\n");
 	/* debug category for filtering log messages
 	 *
 	 * exchange the string 'Template croptech' with your description
@@ -168,7 +167,6 @@ static gboolean croptech_init (GstPlugin * croptech)
 //Second entry point of every plugin
 static void gst_croptech_class_init (GstCroptechClass * klass)
 {
-	g_print("Second entry point of every plugin:class init\n");
 	/*It is the GObjectClass  variable is a pointer to the class structure of a GObject-derived class and 
 	 * it represents the blueprint or definition of a class and contains function pointers, class-specific data,
 	 * and other information necessary for working with instances of that class.
@@ -226,6 +224,7 @@ static void gst_croptech_class_init (GstCroptechClass * klass)
 static void gst_croptech_init (GstCroptech * filter)
 {
 	GST_DEBUG_OBJECT(filter,"Third entry point of every plugin:gst_plugin_init\n");
+
 
 	/*--------------PAD RETRIEVAL-----------------------*/
 	//it retrieves the src pad from static pad templates
@@ -314,7 +313,7 @@ static void gst_croptech_get_property (GObject * object, guint prop_id,GValue * 
 {
 	//It retrieves the elements data from object
 	GstCroptech *filter = GST_CROPTECH (object);
-        GST_DEBUG_OBJECT(filter,"croptech plugin sink event is invoked");
+        
 	switch (prop_id) {
 		case PROP_SILENT:
 			g_value_set_boolean (value, filter->silent);
@@ -343,17 +342,17 @@ static void gst_croptech_get_property (GObject * object, guint prop_id,GValue * 
 //Sink event handling function
 static gboolean gst_croptech_sink_event (GstPad * pad, GstObject * parent,GstEvent * event)
 {
-	
+	g_print("gst_custom sink event  is invoked\n");
 	GstCroptech *filter;
 	gboolean ret;
 
 	//It retrieves the elements data from object
 	filter = GST_CROPTECH (parent);
-
+        GST_DEBUG_OBJECT(filter,"croptech plugin sink event is invoked");
 	//For debug info to genarate the log file
 	GST_LOG_OBJECT (filter, "Received %s event: %" GST_PTR_FORMAT,GST_EVENT_TYPE_NAME (event), event);
-	GST_DEBUG_OBJECT(filter,"croptech plugin sink event is invoked");
-
+	g_print ("Received %s event: %" GST_PTR_FORMAT,GST_EVENT_TYPE_NAME (event), event);
+	g_print("\n");
 
 	switch (GST_EVENT_TYPE (event)) {
 		case GST_EVENT_CAPS:
@@ -405,7 +404,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	}
 	else
 	{
-				GST_DEBUG_OBJECT(filter,"failed  to Parse caps and update video info \n");
+		GST_DEBUG_OBJECT(filter,"failed  to Parse caps and update video info \n");
 	}
 
 	
@@ -435,7 +434,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height)/4;
 				o_v_size=(o_width * o_height)/4;
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YV12 : %d\n",o_size);
 				strcpy(filter->format,"YV12");
 				o_bpp=12;
 				break;
@@ -447,7 +446,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height)/4;
 				o_v_size=(o_width * o_height)/4;
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV21 : %d\n",o_size);
 				denom1=2;
 				denom2=2;
 				strcpy(filter->format,"NV21");
@@ -461,7 +460,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height)/2;
 				o_v_size=(o_width * o_height)/2;
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV16 : %d\n",o_size);
 				denom1=1;
 				denom2=2;
 				strcpy(filter->format,"NV16");
@@ -474,7 +473,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height);
 				o_v_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for NV24 : %d\n",o_size);
 				denom1=1;
 				denom2=1;
 				strcpy(filter->format,"NV24");
@@ -487,7 +486,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height);
 				o_v_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB : %d\n",o_size);
 				strcpy(filter->format,"RGB");
 				o_bpp=24;
 				ind=0;
@@ -499,7 +498,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height);
 				o_v_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGR : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"BGR");
 				o_bpp=24;
@@ -510,7 +509,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height);
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY8 : %d\n",o_size);
 				strcpy(filter->format,"GRAY8");
 				o_bpp=8;
 				break;
@@ -522,7 +521,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBx : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"RGBx");
 				o_bpp=32;
@@ -535,7 +534,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for xRGB : %d\n",o_size);
 				ind=3;
 				strcpy(filter->format,"xRGB");
 				o_bpp=32;
@@ -548,7 +547,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRx : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"BGRx");
 				o_bpp=32;
@@ -561,7 +560,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for xBGR : %d\n",o_size);
 				ind=3;
 				strcpy(filter->format,"xBGR");
 				o_bpp=32;
@@ -574,7 +573,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGBA : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"RGBA");
 				o_bpp=32;
@@ -587,7 +586,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for ARGB : %d\n",o_size);
 				ind=3;
 				strcpy(filter->format,"ARGB");
 				o_bpp=32;
@@ -600,7 +599,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for BGRA : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"BGRA");
 				o_bpp=32;
@@ -613,7 +612,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for ABGR : %d\n",o_size);
 				ind=3;
 				strcpy(filter->format,"ABGR");
 				o_bpp=32;
@@ -623,7 +622,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB16 : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"RGB16");
 				o_bpp=16;
@@ -633,7 +632,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for RGB15 : %d\n",o_size);
 				strcpy(filter->format,"RGB15");
 				o_bpp=15;
 				ind=0;
@@ -645,7 +644,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_u_size=(o_width * o_height)/4;
 				o_v_size=(o_width * o_height)/4;
 				o_size=o_y_size + o_u_size + o_v_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for I420 : %d\n",o_size);
 				denom1=2;
 				denom2=2;
 				strcpy(filter->format,"I420");
@@ -656,7 +655,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_LE : %d\n",o_size);
 				strcpy(filter->format,"GRAY16_LE");
 				o_bpp=16;
 				break;
@@ -665,7 +664,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for GRAY16_BE : %d\n",o_size);
 				strcpy(filter->format,"GRAY16_BE");
 				o_bpp=16;
 				break;
@@ -677,7 +676,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				o_v_size=(o_width * o_height);
 				o_e_size=(o_width * o_height);
 				o_size=o_y_size + o_u_size + o_v_size + o_e_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for AYUV : %d\n",o_size);
 				ind=3;
 				strcpy(filter->format,"AYUV");
 				o_bpp=32;
@@ -687,7 +686,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YUY2 : %d\n",o_size);
 				ind=0;
 				strcpy(filter->format,"YUY2");
 				o_bpp=16;
@@ -697,7 +696,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for YVYU : %d\n",o_size);
 				strcpy(filter->format,"YVYU");
 				o_bpp=16;
 				break;
@@ -706,13 +705,13 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 			{
 				o_y_size=(o_width * o_height)*2;
 				o_size=o_y_size;
-				g_print("Buffer creating size:%d\n",o_size);
+				GST_DEBUG_OBJECT(filter,"Buffer creating size for UYVY : %d\n",o_size);
 				strcpy(filter->format,"UYVY");
 				o_bpp=16;
 				break;
 			}
 		default:
-			g_print("Please give valid format\n");
+			GST_DEBUG_OBJECT(filter,"Please give valid format\n");
 			break;
 	}
 	/*----------------Caps for my own buffer -----------------*/
@@ -729,11 +728,11 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	/*-------------------------------------------------------*/
 	if(gst_video_info_from_caps(&o_video_info, o_caps))
 	{
-		g_print("Successfully videoinfo is taken and updated own caps\n");
+		GST_DEBUG_OBJECT(filter,"Successfully caps parsed and video info is updated \n");
 	}
 	else
 	{
-		g_print("failure videoinfo is mapped in own buffer\n");
+		GST_DEBUG_OBJECT(filter,"Failed  parse caps and video info  updation \n");
 	}
 	/*----------------------------------Video info from caps:end-------------------------------------------*/
 
@@ -744,12 +743,12 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	/*-----------------------------------------------------------------------------------------------------*/
 	gint corner_x = filter->xco;
 	gint corner_y = filter->yco;
-	g_print("corner x:%d    corner y:%d\n",corner_x,corner_y);
+	GST_DEBUG_OBJECT(filter,"corner x:%d    corner y:%d\n",corner_x,corner_y);
 
 	// Calculate the coordinates of the top-left and bottom-right corners
 	gint rect_bottom = corner_y + o_height;
 	gint rect_right = corner_x + o_width;
-	g_print("rect bot:%d    rect right:%d\n",rect_bottom,rect_right);
+	GST_DEBUG_OBJECT(filter,"The max height : %d   The max width : %d\n",rect_bottom,rect_right);
 
 	/*-----------------------------------------------------------------------------------------------------*/
 	/*------------------------------------Corner points calculations:end----------------------------------*/
@@ -760,13 +759,13 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	my_buffer= gst_buffer_new_allocate(NULL, o_size, NULL );
 	if (!gst_buffer_make_writable(my_buffer))
 	{
-		g_print("Failed to make the buffer writable\n");
+		GST_DEBUG_OBJECT(filter,"Failed  to make the buffer writable \n");
 		gst_buffer_unref(my_buffer);
 		return -1;
 	}
 	else
 	{
-		g_print("Successfully writable permissions is given to own buffer\n");
+		GST_DEBUG_OBJECT(filter,"Successfully writable permissions are given to own buffer\n");
 	}
 	gst_buffer_memset(my_buffer,0,0,o_size); //it clears the garbage values in created buffer
 
@@ -778,21 +777,22 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	//Predefined buffer video map
 	if(gst_video_frame_map(&p_vframe, &p_video_info, buf, GST_MAP_READ))
 	{
-		g_print("Successfully videoframe is mapped for predefined buffer\n");
+		GST_DEBUG_OBJECT(filter,"Successfilly videoframe is mapped for predefined buffer \n");
 	}
 	else
 	{
-		g_print("failure videoframe is mapped for predefined buffer\n");
+		GST_DEBUG_OBJECT(filter,"Failed to map the video frame for predefined buffer\n");
 	}
 
 	//Own buffer video map
 	if(gst_video_frame_map(&o_vframe, &o_video_info, my_buffer, GST_MAP_WRITE))
 	{
-		g_print("Successfully videoframe is mapped for own buffer\n");
+		GST_DEBUG_OBJECT(filter,"Successfilly videoframe is mapped for own buffer \n");
 	}
 	else
 	{
-		g_print("failure videoframe is mapped for own buffer\n");
+		GST_DEBUG_OBJECT(filter,"Failed to map the video frame for own buffer\n");
+		return GST_FLOW_ERROR;
 	}
 	/*---------------------------------------------------------------------------------------------------*/
 	/*--------------------------------------Video frame mapping:end--------------------------------------*/
@@ -803,11 +803,13 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe); //it retrieves the predefined width
 	p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe); //it retrieves the predefined height
 	gint planes=GST_VIDEO_FRAME_N_PLANES(&o_vframe); //it retrieves the no of planes 
-	g_print("The no of planes :%d\n",planes);
+	GST_DEBUG_OBJECT(filter,"No of planes : %d\n",planes);
 
 	if(rect_right > p_width || rect_bottom > p_height)
 	{
-		g_warning("exceeded caps\n");
+		g_warning("Please give the width,height,x cordinate and y cordinate within the limits only\n");
+		g_message("The valid caps : Width : %d  Height : %d\n",p_width,p_height);
+		g_message("Give the inputs within this caps limit\n");
 		gst_video_frame_unmap(&o_vframe);
 		gst_video_frame_unmap(&p_vframe);
 		exit(1);
@@ -831,10 +833,9 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
 		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for own buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		g_print("The y stride:%d    The y pixel stride:%d\n",o_rgb_stride,o_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"Strides of a own buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
+		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",o_rgb_stride,o_pixel_stride);
 
 
 		/*-------------------Getting strides for predefined buffer---------------------------*/
@@ -848,10 +849,9 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
 		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for predefined buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		g_print("The rgb stride:%d    The rgb pixel stride:%d\n",p_rgb_stride,p_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"Strides and caps info for predefined buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
+		GST_DEBUG_OBJECT(filter,"The rgb stride:%d    The rgb pixel stride:%d\n",p_rgb_stride,p_pixel_stride);
 
 
 
@@ -925,11 +925,10 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
 		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for own buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		g_print("The y stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride);
-		g_print("The uv  stride:%d    The uv pixel stride:%d\n",o_uv_stride,o_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"Strides and caps info for Own buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
+		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",o_uv_stride,o_pixel_stride);
 
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -945,11 +944,10 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
 		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for predefined buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		g_print("The y stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride);
-		g_print("The uv  stride:%d    The uv pixel stride:%d\n",p_uv_stride,p_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"Strides and caps info for Predefined buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
+		GST_DEBUG_OBJECT(filter,"The y stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride);
+		GST_DEBUG_OBJECT(filter,"The uv  stride:%d    The uv pixel stride:%d\n",p_uv_stride,p_pixel_stride);
 
 
 		gint h1=0,w1=0,h2=0,w2=0;
@@ -1003,12 +1001,11 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		o_width = GST_VIDEO_FRAME_WIDTH(&o_vframe);
 		o_height = GST_VIDEO_FRAME_HEIGHT(&o_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for own buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
-		g_print("The y stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride_y);
-		g_print("The u  stride:%d    The u pixel stride:%d\n",o_u_stride,o_pixel_stride_u);
-		g_print("The v  stride:%d    The v pixel stride:%d\n",o_v_stride,o_pixel_stride_v);
+		GST_DEBUG_OBJECT(filter,"Strides and caps info for Own buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",o_width,o_height);
+		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",o_y_stride,o_pixel_stride_y);
+		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",o_u_stride,o_pixel_stride_u);
+		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",o_v_stride,o_pixel_stride_v);
 
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -1029,13 +1026,11 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		p_width = GST_VIDEO_FRAME_WIDTH(&p_vframe);
 		p_height = GST_VIDEO_FRAME_HEIGHT(&p_vframe);
 
-		g_print("/*------------------------------------------------------*/\n");
-		g_print("Strides and caps info for predefined buffer\n");
-		g_print("The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
-		g_print("The y stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride_y);
-		g_print("The u  stride:%d    The u pixel stride:%d\n",p_u_stride,p_pixel_stride_u);
-		g_print("The v  stride:%d    The v pixel stride:%d\n",p_v_stride,p_pixel_stride_v);
-
+		GST_DEBUG_OBJECT(filter,"Strides and caps info for Predefined buffer\n");
+		GST_DEBUG_OBJECT(filter,"The width:%d (which is updated in caps)   The height:%d\n",p_width,p_height);
+		GST_DEBUG_OBJECT(filter,"The y  stride:%d    The y pixel stride:%d\n",p_y_stride,p_pixel_stride_y);
+		GST_DEBUG_OBJECT(filter,"The u  stride:%d    The u pixel stride:%d\n",p_u_stride,p_pixel_stride_u);
+		GST_DEBUG_OBJECT(filter,"The v  stride:%d    The v pixel stride:%d\n",p_v_stride,p_pixel_stride_v);
 		/*---------------------------------------------------------------------------------------------------------------------------------*/
 
 		gint h1=0,w1=0,h2=0,w2=0;
@@ -1073,7 +1068,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 		}
 	}
 
-	g_print("Negotiated cap: %s\n", gst_caps_to_string(o_caps));
+	GST_DEBUG_OBJECT(filter,"Negotiated caps: %s\n", gst_caps_to_string(o_caps));
 	// Set the negotiated caps on the source pad
 	gst_pad_set_caps(filter->srcpad, o_caps);
 	gst_video_frame_unmap(&o_vframe);
