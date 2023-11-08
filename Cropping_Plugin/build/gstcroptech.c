@@ -107,23 +107,27 @@ static GstStaticPadTemplate sink_factory = GST_STATIC_PAD_TEMPLATE ("sink",
 		GST_PAD_SINK,
 		GST_PAD_ALWAYS,
 		GST_STATIC_CAPS ("video/x-raw, "
-                                         "width = (int) [1, 2147483647], "
-                                         "height = (int) [1, 2147483647], "
+                                         
                                          "framerate = (fraction) [0/1, 2147483647/1], "
                                          "format = (string) { I420, NV12, NV21, YV12,RGB16,NV16,NV24,\
 					 RGBx, xRGB, BGRx, xBGR, RGBA, ARGB,BGRA, ABGR, RGB, BGR, AYUV, YUY2, \
-					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE }"));
+					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE },"
+					 "width = (int) [1, 2147483647], "
+                                         "height = (int) [1, 2147483647]"
+                                         ));
 //It creates the sink template for my plugin
 static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE ("src",
 		GST_PAD_SRC,
 		GST_PAD_ALWAYS,
 		GST_STATIC_CAPS ("video/x-raw, "
-                                         "width = (int) [1, 2147483647], "
-                                         "height = (int) [1, 2147483647], "
+                                       
                                          "framerate = (fraction) [0/1, 2147483647/1], "
                                          "format = (string) { I420, NV12, NV21, YV12,RGB16,NV16,NV24,\
 					 RGBx, xRGB, BGRx, xBGR, RGBA, ARGB,BGRA, ABGR, RGB, BGR, AYUV, YUY2, \
-					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE }"));
+					 YVYU, UYVY, I420, YV12, RGB16, RGB15, GRAY8, NV12, NV21,GRAY16_LE, GRAY16_BE },"
+					  "width = (int) [1, 2147483647], "
+                                         "height = (int) [1, 2147483647]"
+                                         ));
 
 
 /*--------substitute the parent_class in place of own variable gst_custom_parent_class-------*/
@@ -153,6 +157,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad,GstObject * parent, GstBuf
 //Every plugin first entry point
 static gboolean croptech_init (GstPlugin * croptech)
 {
+	
 	/* debug category for filtering log messages
 	 *
 	 * exchange the string 'Template croptech' with your description
@@ -167,6 +172,7 @@ static gboolean croptech_init (GstPlugin * croptech)
 //Second entry point of every plugin
 static void gst_croptech_class_init (GstCroptechClass * klass)
 {
+	
 	/*It is the GObjectClass  variable is a pointer to the class structure of a GObject-derived class and 
 	 * it represents the blueprint or definition of a class and contains function pointers, class-specific data,
 	 * and other information necessary for working with instances of that class.
@@ -208,9 +214,9 @@ static void gst_croptech_class_init (GstCroptechClass * klass)
 	 * which is nontechnical info and technical info.
 	 */
 	gst_element_class_set_details_simple (gstelement_class,
-			"Croptech",
-			"FIXME:Generic",
-			"FIXME:Generic Template Element", "Pranav <<user@hostname.org>>");
+			"Video crop",
+			"Filter/Effect/Video",
+			"Crops video into a user defined region", "Bhargav <mbrpranav659@gmail.com>");
 
 	/*-----This function is used to define the input and output pad templates that an element class supports.---*/
 	//it add the src template to the element class
@@ -1093,7 +1099,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
  * compile this code. GST_PLUGIN_DEFINE needs PACKAGE to be defined.
  */
 #ifndef PACKAGE
-#define PACKAGE "myfirstcroptech"
+#define PACKAGE "gst-plugins-bad"
 #endif
 
 /* gstreamer looks for this structure to register croptechs
@@ -1103,9 +1109,9 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
 		GST_VERSION_MINOR,
 		croptech,
-		"croptech",
+		"Crops video into a user defined region",
 		croptech_init,
-		PACKAGE_VERSION, GST_LICENSE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)
+		PACKAGE_VERSION, GST_LICENSE, "Gstreamer Bad plugins (Ubuntu) ", "https://launchpad.net/ubuntu/+source/gst-plugins-bad1.0")
 /*-----------GST_PLUGIN_DEFINE is a macro provided by GStreamer for defining a GStreamer plugin.
  * It simplifies the process of registering the plugin with GStreamer's plugin system.
  */
