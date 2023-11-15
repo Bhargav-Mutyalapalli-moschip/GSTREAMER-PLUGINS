@@ -1,13 +1,13 @@
 #define DEFAULT_SIZE 1920
-#define DEF_START 0
+#define DEF_START -2147483648
 #define DEF_END 2147483647
 #define DEF_WVAL 0
 #define DEF_HVAL 0
 #define DEF_XVAL 0
 #define DEF_YVAL 0
-#define DEF_XSTART 0
+#define DEF_XSTART -2147483648
 #define DEF_XEND 2147483647
-#define DEF_YSTART 0
+#define DEF_YSTART -2147483648
 #define DEF_YEND 2147483647
 
 /*----------------Gstreamer Variable declarartions----------------------*/
@@ -131,6 +131,7 @@
 	gint ind=0;
 	gint denom1=0;
 	gint denom2=0;
+	gint flag1=0,flag2=0,flag3=0,flag4=0;
 
 
 

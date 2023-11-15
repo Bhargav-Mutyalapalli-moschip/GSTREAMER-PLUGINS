@@ -286,21 +286,62 @@ static void gst_croptech_set_property (GObject * object, guint prop_id,const GVa
 			filter->silent = g_value_get_boolean (value);
 			break;
 		case PROP_WIDTH:
+			if (g_value_get_int(value) < 0) 
+			{
+				flag1=1;
+			}
 			filter->width = g_value_get_int (value);
 			break;
 		case PROP_HEIGHT:
+			if (g_value_get_int(value) < 0) 
+			{
+				flag2=1;
+			}
 			filter->height = g_value_get_int (value);
 			break;
 		case PROP_XCO:
+			if (g_value_get_int(value) < 0) 
+			{
+				flag3=1;
+			}
 			filter->xco = g_value_get_int (value);
 			break;
 		case PROP_YCO:
+			if (g_value_get_int(value) < 0) 
+			{
+				flag4=1;
+			}
 			filter->yco = g_value_get_int (value);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 			break;
 	}
+	if( flag1 == 1 || flag2 == 1 || flag3 == 1 || flag4 == 1)
+	{
+		if(flag1 == 1)
+		{
+			g_warning("Width cannot be set to a negative value");
+			g_message("Please give the positive value\n");
+		}
+		else if(flag2 == 1)
+		{
+			g_warning("Height cannot be set to a negative value");
+			g_message("Please give the positive value\n");
+		}
+		else if(flag3 == 1)
+		{
+			g_warning("X cordinate cannot be set to a negative value");
+			g_message("Please give the positive value\n");
+		}
+		else if(flag4 == 1)
+		{
+			g_warning("Y cordinate cannot be set to a negative value");
+			g_message("Please give the positive value\n");
+		}
+		exit(-1);
+	}
+
 }
 
 //Fifth Entry point of every plugin(If you request the properties)
@@ -418,8 +459,6 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 	}
 	/*--------------------------------------------------------*/
 
-	org_width=pre_video_info.width;
-	org_height=pre_video_info.height;
 	/*-----Retrieving the format macro number from the video info structure-------*/
 	org_format_no=pre_video_info.finfo->format;
 
@@ -627,7 +666,7 @@ static GstFlowReturn gst_croptech_chain (GstPad * pad, GstObject * parent, GstBu
 				GST_DEBUG_OBJECT(filter,"Buffer creating size for ABGR : %d\n",org_size);
 				ind=3;
 				strcpy(filter->format,"ABGR");
-					org_bpp=32;
+				org_bpp=32;
 				break;
 			}
 		case GST_VIDEO_FORMAT_RGB16:
